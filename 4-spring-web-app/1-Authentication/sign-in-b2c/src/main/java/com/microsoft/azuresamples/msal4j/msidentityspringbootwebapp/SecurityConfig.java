@@ -3,38 +3,44 @@
 
 package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapp;
 
-import com.azure.spring.autoconfigure.b2c.AADB2COidcLoginConfigurer;
+//import com.azure.spring.cloud.autoconfigure.aadb2c.AadB2cOidcLoginConfigurer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.context.annotation.RequestScope;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-/**
- * update comments here
- */
-
+@Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity
+public class SecurityConfig  {
 
     @Value("${app.protect.authenticated}")
-    private String[] protectedRoutes;
+    private String[] allowedOrigins;
+   /*  private final AadB2cOidcLoginConfigurer configurer;
 
-    private final AADB2COidcLoginConfigurer configurer;
-
-    public SecurityConfig(AADB2COidcLoginConfigurer configurer) {
+    public SecurityConfig(AadB2cOidcLoginConfigurer configurer) {
         this.configurer = configurer;
+    } */
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // @formatter:off
+        http.authorizeHttpRequests(auth -> auth
+            .requestMatchers(allowedOrigins).authenticated()
+            .anyRequest().permitAll()
+            );
+        // @formatter:on
+        return http.build();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        // @formatter:off
-        http.authorizeRequests()
-            .antMatchers(protectedRoutes).authenticated()     // limit these pages to authenticated users (default: /token_details)
-            .antMatchers("/**").permitAll()                  // allow all other routes.
-            .and()
-            .apply(configurer)
-            ;
-        // @formatter:off
-    }
-
+    @Bean
+    @RequestScope
+    public ServletUriComponentsBuilder urlBuilder() {
+        return ServletUriComponentsBuilder.fromCurrentRequest();
+    }  
 }
