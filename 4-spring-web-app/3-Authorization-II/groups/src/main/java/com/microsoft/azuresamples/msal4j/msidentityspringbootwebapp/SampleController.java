@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -90,7 +90,7 @@ public class SampleController {
      * @return String the UI.
      */
     @GetMapping(path = "/admin_only")
-    @PreAuthorize("hasAuthority('Enter_Your_Admin_Group_ID_Here')")
+    @PreAuthorize("hasAuthority('AdminGroup')")
     public String adminOnly(Model model) {
         // method decorator limits access to this endpoint to admin group
         return hydrateUI(model, "group");
@@ -107,7 +107,7 @@ public class SampleController {
      * @return String the UI.
      */
     @GetMapping(path = "/regular_user")
-    @PreAuthorize("hasAnyAuthority('Enter_Your_User_Group_ID_Here')")
+    @PreAuthorize("hasAnyAuthority('d585f48f-5f03-48dd-b908-6d3b12d247ce', 'f17c30c2-a59d-4d97-a350-d6a3535768b3')")
     public String regularUser(Model model) {
         // method decorator limits access to this endpoint to user group
         return hydrateUI(model, "group");
